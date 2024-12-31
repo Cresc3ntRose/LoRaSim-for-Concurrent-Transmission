@@ -13,7 +13,7 @@ This project simulates concurrent LoRa packet transmissions to analyze interfere
 
 ## Installation
 ```bash
-git clone [repository-url]
+git clone [git@github.com:Cresc3ntRose/LoRaSim-for-Concurrent-Transmission.git]
 cd lorasim_concurrent_transmission
 cargo build --release
 ```
