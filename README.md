@@ -19,7 +19,7 @@ cargo build --release
 ```
 
 ## Usage
-1. Generate Random Packets<br>
+1. Generate Random Packets
    ```bash
    cargo run -- --random
    ```

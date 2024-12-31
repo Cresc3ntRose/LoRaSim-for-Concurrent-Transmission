@@ -19,12 +19,12 @@ cargo build --release
 ```
 
 ## 使用方法
-1. 生成随机数据包<br>
+1. 生成随机数据包
    ```bash
    cargo run -- --random
    ```
    此命令生成随机 LoRa 数据包并保存到数据目录。
-2. 运行现有数据包仿真<br>
+2. 运行现有数据包仿真
    ```bash
    cargo run
    ```
@@ -45,4 +45,4 @@ src/
 ```
 
 ## 许可证
-本项目采用 GNU 通用公共许可证 v3.0 授权 - 详见[LICENSE](LICENSE)文件。
+本项目采用 GNU 通用公共许可证 v3.0 授权 - 详见 [LICENSE](LICENSE) 文件。
