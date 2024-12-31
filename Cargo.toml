@@ -1,0 +1,17 @@
+[package]
+name = "lorasim_concurrent_transmit"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+log = "0.4"
+fern = "0.6"
+chrono = { version = "0.4", features = ["serde"] }
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+crossbeam = "0.8"
+lazy_static = "1.4"
+
+[[bin]]
+name = "main"
