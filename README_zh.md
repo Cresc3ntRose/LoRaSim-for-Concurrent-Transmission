@@ -13,7 +13,7 @@
 
 ## 安装方法
 ```bash
-git clone [git@github.com:Cresc3ntRose/LoRaSim-for-Concurrent-Transmission.git]
+git clone git@github.com:Cresc3ntRose/LoRaSim-for-Concurrent-Transmission.git
 cd lorasim_concurrent_transmission
 cargo build --release
 ```
