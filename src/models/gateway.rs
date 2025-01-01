@@ -198,17 +198,117 @@ impl Gateway {
     //     DistributeStatus::AllChannelsFull
     // }
 
-    /// Distribute one packet to the channel queues with the minimum load
+    // /// Distribute one packet to the channel queues based on the load
+    // pub fn distribute_one_packet(&self) -> DistributeStatus {
+    //     {
+    //         if self.is_pending_queue_empty() {
+    //             return DistributeStatus::EmptyQueue;
+    //         }
+    //     }
+    
+    //     {
+    //         let mut pending_queue = self.pending_queue.lock().unwrap();
+    
+    //         let packet = match pending_queue.front() {
+    //             Some(p) => p,
+    //             None => {
+    //                 error!("Unexpected empty pending queue");
+    //                 return DistributeStatus::EmptyQueue;
+    //             }
+    //         };
+    
+    //         if self.is_timeout(packet) {
+    //             return DistributeStatus::Timeout;
+    //         }
+
+    //         if !(0..8).any(|i| !self.is_channel_queue_full(i)) {
+    //             info!("\u{1F613}: All channels are full");
+    //             return DistributeStatus::AllChannelsFull;
+    //         }
+
+    //         let channel_index = (0..8)
+    //             .filter(|i| !self.is_channel_queue_full(*i))
+    //             .min_by_key(|i| {
+    //                 let channel_queues = self.channel_queues.lock().unwrap();
+    //                 channel_queues[*i].len()
+    //             })
+    //             .unwrap();
+
+    //         if !self.is_channel_queue_full(channel_index) {
+    //             info!("Packet {} is allocated to channel {}", packet.packet_id, channel_index);
+    //             let packet = pending_queue.pop_front().unwrap();
+    //             let mut channel_queues = self.channel_queues.lock().unwrap();
+    //             channel_queues[channel_index].push_back(packet);
+    //             return DistributeStatus::Success(channel_index);
+    //         }
+    //     }
+    
+    //     info!("\u{1F613}: All channels are full");
+    //     DistributeStatus::AllChannelsFull
+    // }
+
+    // /// Distribute one packet to the channel queues based on the time load
+    // pub fn distribute_one_packet(&self) -> DistributeStatus {
+    //     {
+    //         if self.is_pending_queue_empty() {
+    //             return DistributeStatus::EmptyQueue;
+    //         }
+    //     }
+    
+    //     {
+    //         let mut pending_queue = self.pending_queue.lock().unwrap();
+    
+    //         let packet = match pending_queue.front() {
+    //             Some(p) => p,
+    //             None => {
+    //                 error!("Unexpected empty pending queue");
+    //                 return DistributeStatus::EmptyQueue;
+    //             }
+    //         };
+    
+    //         if self.is_timeout(packet) {
+    //             return DistributeStatus::Timeout;
+    //         }
+
+    //         // Create a tuple containing the channel index and the total time of the channel queue
+    //         let mut channel_time: Vec<(usize, Duration)> = (0..8)
+    //             .map(|i| {
+    //                 let channel_queues = self.channel_queues.lock().unwrap();
+    //                 let total_time = channel_queues[i].iter().map(|p| p.processing_time).sum();
+    //                 (i, total_time)
+    //             })
+    //             .collect();
+
+    //         // Sort by total_time in ascending order
+    //         channel_time.sort_by_key(|(_, total_time)| *total_time);
+
+    //         // Iterate over the channel_time's usize
+    //         for (i, _) in channel_time {
+    //             if !self.is_channel_queue_full(i) {
+    //                 info!("Packet {} is allocated to channel {}", packet.packet_id, i);
+    //                 let packet = pending_queue.pop_front().unwrap();
+    //                 let mut channel_queues = self.channel_queues.lock().unwrap();
+    //                 channel_queues[i].push_back(packet);
+    //                 return DistributeStatus::Success(i);
+    //             }
+    //         }
+    //     }
+    
+    //     info!("\u{1F613}: All channels are full");
+    //     DistributeStatus::AllChannelsFull
+    // }
+
+    /// Distribute one packet to the channel queues based on the time load with pending queue optimization
     pub fn distribute_one_packet(&self) -> DistributeStatus {
         {
             if self.is_pending_queue_empty() {
                 return DistributeStatus::EmptyQueue;
             }
         }
-
+    
         {
-            let mut pending_queue = self.pending_queue.lock().unwrap();
-
+            let pending_queue = self.pending_queue.lock().unwrap();
+    
             let packet = match pending_queue.front() {
                 Some(p) => p,
                 None => {
@@ -216,31 +316,42 @@ impl Gateway {
                     return DistributeStatus::EmptyQueue;
                 }
             };
-
+    
             if self.is_timeout(packet) {
                 return DistributeStatus::Timeout;
             }
-
-            let mut channel_queues = self.channel_queues.lock().unwrap();
-            let mut min_load = usize::MAX;
-            let mut selected_channel = None;
-
-            for (i, queue) in channel_queues.iter().enumerate() {
-                let load = queue.len();
-                if load < min_load && !self.is_channel_queue_full(i) {
-                    min_load = load;
-                    selected_channel = Some(i);
-                }
-            }
-
-            if let Some(channel) = selected_channel {
-                info!("Packet {} is allocated to channel {}", packet.packet_id, channel);
-                let packet = pending_queue.pop_front().unwrap();
-                channel_queues[channel].push_back(packet);
-                return DistributeStatus::Success(channel);
-            }
         }
 
+        {
+            // For each packet in the pending_queue, sort them by processing_time, 
+            // with shorter processing_time being processed first
+            let mut pending_queue = self.pending_queue.lock().unwrap();
+            pending_queue.make_contiguous().sort_by_key(|p| p.processing_time);
+
+            // Create a tuple containing the channel index and the total time of the channel queue
+            let mut channel_time: Vec<(usize, Duration)> = (0..8)
+                .map(|i| {
+                    let channel_queues = self.channel_queues.lock().unwrap();
+                    let total_time = channel_queues[i].iter().map(|p| p.processing_time).sum();
+                    (i, total_time)
+                })
+                .collect();
+
+            // Sort by total_time in ascending order
+            channel_time.sort_by_key(|(_, total_time)| *total_time);
+
+            // Iterate over the channel_time's usize
+            for (i, _) in channel_time {
+                if !self.is_channel_queue_full(i) {
+                    let packet = pending_queue.pop_front().unwrap();
+                    info!("Packet {} is allocated to channel {}", packet.packet_id, i);
+                    let mut channel_queues = self.channel_queues.lock().unwrap();
+                    channel_queues[i].push_back(packet);
+                    return DistributeStatus::Success(i);
+                }
+            }
+        }
+    
         info!("\u{1F613}: All channels are full");
         DistributeStatus::AllChannelsFull
     }
