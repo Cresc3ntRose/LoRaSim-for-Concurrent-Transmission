@@ -16,15 +16,16 @@
  */
 
 use crate::models::packet::Packet;
-use log::info;
+use log::{info, error};
 use rand::Rng;
 use chrono::Duration;
 use serde_json::json;
-use log::error;
+
 use std::error::Error;
 use std::fs::File;
 use std::collections::VecDeque;
 
+/// Setup data for the simulation
 fn setup_data(packets: &VecDeque<Packet>) -> Result<(), Box<dyn Error>> {
     let data_file_path = "data/packet.json";
     let file = File::create(data_file_path)?;
@@ -41,6 +42,7 @@ fn setup_data(packets: &VecDeque<Packet>) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+/// Generate random packets for the simulation
 pub fn generate_random_packet() -> Result<VecDeque<Packet>, Box<dyn Error>> {
 
     let mut rng = rand::thread_rng();

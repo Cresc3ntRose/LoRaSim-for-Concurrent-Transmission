@@ -19,11 +19,13 @@ use crate::models::packet::Packet;
 use log::error;
 use log::info;
 use serde_json::from_reader;
+
 use std::error::Error;
 use std::collections::VecDeque;
 use std::fs::File;
 use std::path::Path;
 
+/// Load data from file
 pub fn load_data() -> Result<VecDeque<Packet>, Box<dyn Error>> {
 
     let data_file_path = "data/packet.json";

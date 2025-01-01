@@ -34,14 +34,16 @@ cargo build --release
 ```bash
 src/
 ├── bin/
-│   └── main.rs          # 主入口
-├── models/
-│   ├── mod.rs          # 模型模块
-│   └── packet.rs       # 数据包定义
-└── data_access/
-    ├── mod.rs          # 数据访问模块
-    ├── generate_packets.rs  # 数据包生成
-    └── get_packets.rs   # 数据包获取
+│   └── main.rs              # 程序入口点
+├── models/                  # 模型定义
+│   ├── mod.rs              # 模型模块声明
+│   ├── packet.rs           # LoRa 数据包定义
+│   └── gateway.rs          # 网关定义
+└── data_access/            # 数据访问层
+    ├── mod.rs              # 数据访问模块声明  
+    ├── generate_packets.rs  # 生成随机数据包
+    ├── get_packets.rs      # 读取数据包
+    └── setup_logger.rs     # 日志配置
 ```
 
 ## 许可证

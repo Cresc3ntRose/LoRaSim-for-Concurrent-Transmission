@@ -16,3 +16,4 @@
  */
 
 pub mod packet;
+pub mod gateway;

@@ -35,14 +35,17 @@ cargo build --release
 ```bash
 src/
 ├── bin/
-│   └── main.rs          # Main entry point
-├── models/
-│   ├── mod.rs           # Models module
-│   └── packet.rs        # Packet definition
-└── data_access/
-    ├── mod.rs           # Data access module
-    ├── generate_packets.rs  # Packet generation
-    └── get_packets.rs    # Packet retrieval
+│   └── main.rs              # Entry point of the program
+├── models/                  # Model definitions
+│   ├── mod.rs               # Model module declaration
+│   ├── packet.rs            # LoRa packet definition
+│   └── gateway.rs           # Gateway definition
+└── data_access/             # Data access layer
+   ├── mod.rs               # Data access module declaration  
+   ├── generate_packets.rs  # Generate random packets
+   ├── get_packets.rs       # Read packets
+   └── setup_logger.rs      # Logger configuration
+```
 ```
 
 ## License
