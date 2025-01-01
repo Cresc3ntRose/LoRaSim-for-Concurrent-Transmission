@@ -2,14 +2,15 @@
 
 [English](README.md) | [中文](README_zh.md)
 
-## Project Description
-
-This project simulates concurrent LoRa packet transmissions to analyze interference patterns and network performance.
+## Project Overview
+This project aims to simulate concurrent LoRa packet transmissions to analyze interference patterns and network performance. By simulating simultaneous transmissions from multiple LoRa nodes, it evaluates the effectiveness of channel scheduling and allocation strategies, and generates detailed transmission statistics and performance metrics.
 
 ## Features
-- Simulates multiple LoRa nodes transmitting simultaneously
-- Simulates channel scheduling and allocation 
-- Generates transmission statistics and performance metrics
+- Concurrent transmission simulation
+- Channel scheduling and allocation
+- Queue management
+- Timeout handling and retransmission mechanism
+- Multithreading
 
 ## Installation
 ```bash
@@ -23,7 +24,7 @@ cargo build --release
    ```bash
    cargo run -- --random
    ```
-   This command generates random LoRa packets and saves them to the data directory.
+   This command generates random LoRa packets, saves them locally, and performs the simulation using these packets.
 
 2. Run Simulation with Existing Packets
    ```bash
