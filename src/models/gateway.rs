@@ -75,11 +75,12 @@ impl Gateway {
         queue.len() <= 0
     }
 
-    /// Check if the pending queue is full
-    pub fn is_pending_queue_full(&self) -> bool {
-        let queue = self.pending_queue.lock().unwrap();
-        queue.len() >= self.pending_queue_capacity
-    }
+    // #[warn(dead_code)]
+    // /// Check if the pending queue is full
+    // pub fn is_pending_queue_full(&self) -> bool {
+    //     let queue = self.pending_queue.lock().unwrap();
+    //     queue.len() >= self.pending_queue_capacity
+    // }
 
     /// Check if a specific channel queue is empty
     pub fn is_channel_queue_empty(&self, i: usize) -> bool {
@@ -103,6 +104,9 @@ impl Gateway {
         let mut pending_queue = self.pending_queue.lock().unwrap();
         let mut packet = pending_queue.pop_front().unwrap();
         warn!("\u{1F62D}: Packet {} is timeout, resent", packet.packet_id);
+        // if self.is_pending_queue_full() {
+        //     panic!("Pending queue is full, cannot resend packet");
+        // }
         packet.arrival_time = Local::now();
         pending_queue.push_back(packet);
     }
@@ -110,8 +114,6 @@ impl Gateway {
     /// Distribute one packet to the channel queues in a round-robin manner
     pub fn distribute_one_packet(&self) -> DistributeStatus {
         {
-            // let pending_queue = self.pending_queue.lock().unwrap();
-            // if pending_queue.is_empty() {
             if self.is_pending_queue_empty() {
                 return DistributeStatus::EmptyQueue;
             }
@@ -220,7 +222,7 @@ impl Gateway {
                     std::thread::sleep(processing_time_std);
                     
                     let elapsed = start.elapsed();
-                    info!("\u{263A}: Packet {} processed in channel {} (took {:?})", 
+                    info!("\u{1F60A}: Packet {} processed in channel {} (took {:?})", 
                         packet.packet_id, i, elapsed);
                     
                     if elapsed > processing_time_std * 2 {
