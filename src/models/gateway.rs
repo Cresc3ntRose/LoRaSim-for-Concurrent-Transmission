@@ -37,13 +37,13 @@ pub enum DistributeStatus {
 
 #[derive(Debug, Clone)]
 pub struct Gateway {
-    pub id: u32,                                       // Gateway ID
+    pub id: u32,                                            // Gateway ID
     pub pending_queue: Arc<Mutex<VecDeque<Packet>>>,        // Pending queue for packets waiting to be processed
     pub channel_queues: Arc<Mutex<[VecDeque<Packet>; 8]>>,  // Channel queues for packets being processed, 8 channels in total
-    pub pending_queue_capacity: usize,                 // Capacity of the pending queue
-    pub channel_queue_capacity: usize,                 // Capacity of each channel queue
+    pub pending_queue_capacity: usize,                      // Capacity of the pending queue
+    pub channel_queue_capacity: usize,                      // Capacity of each channel queue
     pub should_exit: Arc<std::sync::atomic::AtomicBool>,    // Flag to indicate whether the gateway should exit
-    pub time_threshold: Duration,                      // Time threshold for packet timeout
+    pub time_threshold: Duration,                           // Time threshold for packet timeout
 }
 
 impl Gateway {
@@ -110,8 +110,9 @@ impl Gateway {
     /// Distribute one packet to the channel queues in a round-robin manner
     pub fn distribute_one_packet(&self) -> DistributeStatus {
         {
-            let pending_queue = self.pending_queue.lock().unwrap();
-            if pending_queue.is_empty() {
+            // let pending_queue = self.pending_queue.lock().unwrap();
+            // if pending_queue.is_empty() {
+            if self.is_pending_queue_empty() {
                 return DistributeStatus::EmptyQueue;
             }
         }
@@ -191,7 +192,6 @@ impl Gateway {
 
         let mut threads = vec![];
         for i in 0..8 {
-            // let gateway = GATEWAY.clone();
             let gateway = Arc::clone(&gateway);
             let handle = std::thread::spawn(move || {
                 while !gateway.should_exit.load(std::sync::atomic::Ordering::Relaxed) {

@@ -46,7 +46,6 @@ src/
    ├── get_packets.rs       # Read packets
    └── setup_logger.rs      # Logger configuration
 ```
-```
 
 ## License
 
