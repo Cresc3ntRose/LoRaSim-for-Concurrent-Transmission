@@ -13,9 +13,12 @@ This project aims to simulate concurrent LoRa packet transmissions to analyze in
 - Multithreading
 
 ## Installation
-```bash
+```bash {.line-numbers}
 git clone git@github.com:Cresc3ntRose/LoRaSim-for-Concurrent-Transmission.git
 cd lorasim_concurrent_transmission
+mkdir logs data
+cd logs && touch simulation.log
+cd ../data && touch packet.json && cd ..
 cargo build --release
 ```
 
@@ -36,7 +39,7 @@ cargo build --release
 ```bash
 src/
 ├── bin/
-│   └── main.rs              # Entry point of the program
+│   └── siomulation.rs       # Entry point of the program
 ├── models/                  # Model definitions
 │   ├── mod.rs               # Model module declaration
 │   ├── packet.rs            # LoRa packet definition

@@ -13,9 +13,12 @@
 - 多线程处理
 
 ## 安装方法
-```bash
+```bash {.line-numbers}
 git clone git@github.com:Cresc3ntRose/LoRaSim-for-Concurrent-Transmission.git
 cd lorasim_concurrent_transmission
+mkdir logs data
+cd logs && touch simulation.log
+cd ../data && touch packet.json && cd ..
 cargo build --release
 ```
 
@@ -35,7 +38,7 @@ cargo build --release
 ```bash
 src/
 ├── bin/
-│   └── main.rs              # 程序入口点
+│   └── simulation.rs        # 程序入口点
 ├── models/                  # 模型定义
 │   ├── mod.rs              # 模型模块声明
 │   ├── packet.rs           # LoRa 数据包定义
